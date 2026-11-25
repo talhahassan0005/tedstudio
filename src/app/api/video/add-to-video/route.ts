@@ -7,7 +7,7 @@ import type { VideoAiRequest, VideoResponse } from '@/lib/types';
 import { errorMessage, toDataUrl } from '@/lib/utils';
 
 export const runtime = 'nodejs';
-export const maxDuration = 600;
+export const maxDuration = 300;
 
 /**
  * POST /api/video/add-to-video

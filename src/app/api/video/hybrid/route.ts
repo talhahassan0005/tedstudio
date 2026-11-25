@@ -11,7 +11,7 @@ import { generateImage, isWorkersAiConfigured, planHybridVideo } from '@/lib/wor
 import { errorMessage } from '@/lib/utils';
 
 export const runtime = 'nodejs';
-export const maxDuration = 600;
+export const maxDuration = 300;
 
 const SCENE_COUNT = 8;
 const TARGET_DURATION = 60;

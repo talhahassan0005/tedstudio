@@ -9,7 +9,7 @@ import { errorMessage, toDataUrl } from '@/lib/utils';
 export const runtime = 'nodejs';
 // Video inpainting is minutes, not seconds. Serverless hosts will cap this —
 // move to a queue/webhook flow if your platform's ceiling is lower.
-export const maxDuration = 600;
+export const maxDuration = 300;
 
 /**
  * POST /api/video/erase-from-video
