@@ -1,0 +1,86 @@
+// MediaStudio persistence layer.
+//
+// SQLite on purpose: this is a local-first app and should boot with zero
+// external services. To move to Postgres later, change `provider`/`url`
+// to env("DATABASE_URL") and run `prisma migrate dev` — the models are
+// portable as-is.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+/// A piece of work the user is editing — one per image/video session.
+model Project {
+  id           String   @id @default(cuid())
+  name         String
+  /// "image" | "video"
+  kind         String
+  thumbnailUrl String?
+  /// Cloudinary public_id of the thumbnail asset — used for deletion.
+  publicId     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assets  Asset[]
+  renders Render[]
+
+  @@index([updatedAt])
+}
+
+/// Every file uploaded to Cloudinary, recorded as a media library.
+model Asset {
+  id               String   @id @default(cuid())
+  publicId         String   @unique
+  url              String
+  secureUrl        String
+  format           String
+  /// "image" | "video" | "audio" | "raw"
+  resourceType     String
+  width            Int?
+  height           Int?
+  duration         Float?
+  bytes            Int?
+  originalFilename String?
+  createdAt        DateTime @default(now())
+
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectId String?
+
+  @@index([resourceType, createdAt])
+}
+
+/// One AI image generation event — used to track daily / monthly quota.
+model GenerationLog {
+  id        String   @id @default(cuid())
+  /// "image" | "inpaint" | "erase"
+  kind      String   @default("image")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+/// A finished server-side operation (trim, merge, slideshow, music, video AI).
+/// Image AI results come back as base64 and are not stored anywhere stable,
+/// so they are not recorded here.
+model Render {
+  id        String   @id @default(cuid())
+  /// "trim" | "merge" | "slideshow" | "music" | "ai-erase" | "ai-add"
+  kind      String
+  videoUrl  String
+  publicId  String
+  duration  Float?
+  bytes     Int?
+  /// JSON string of the request parameters, for reproducibility.
+  params    String?
+  createdAt DateTime @default(now())
+
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectId String?
+
+  @@index([kind, createdAt])
+}
