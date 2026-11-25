@@ -6,6 +6,14 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
@@ -72,7 +80,7 @@ export function VideoAIPanel() {
     processingLabel,
   } = useVideoEditorStore();
 
-  const { sourceUrl, eraseFromVideo, addToVideo, generateVideo, generateHybridVideo } = useVideoEditor();
+  const { sourceUrl, eraseFromVideo, addToVideo, generateHybridVideo } = useVideoEditor();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [frame, setFrame] = useState<{ dataUrl: string; width: number; height: number } | null>(
@@ -316,19 +324,26 @@ export function VideoAIPanel() {
             </select>
           </label>
         </div>
-        <Button
-          className="w-full"
-          size="sm"
-          onClick={() => generateVideo({
-            prompt: generationPrompt.trim(),
-            duration: generationDuration,
-            aspectRatio,
-          })}
-          disabled={!generationPrompt.trim() || isProcessing}
-        >
-          {isProcessing ? <Loader2 className="animate-spin" /> : <Sparkles />}
-          Generate with Kling
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button type="button" className="w-full" size="sm">
+              <Sparkles />
+              Generate with Kling
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="w-[calc(100%-2rem)] max-w-sm overflow-hidden rounded-2xl border-primary/30 bg-gradient-to-b from-primary/10 to-background p-7 text-center">
+            <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-primary/15 text-primary ring-1 ring-primary/25">
+              <Sparkles className="h-7 w-7" aria-hidden="true" />
+            </div>
+            <div className="space-y-2">
+              <DialogTitle className="text-2xl">Coming Soon</DialogTitle>
+              <DialogDescription>AI video generation is on its way. Soon you’ll be able to turn your prompts into video clips.</DialogDescription>
+            </div>
+            <DialogClose asChild>
+              <Button type="button" className="mt-1 w-full">Got it</Button>
+            </DialogClose>
+          </DialogContent>
+        </Dialog>
         <p className="text-[11px] text-muted-foreground">Kling 4.0 Flash · 720p · paid API credits</p>
       </div>
 
